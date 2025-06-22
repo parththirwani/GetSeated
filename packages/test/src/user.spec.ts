@@ -13,13 +13,13 @@ const PHONE_NUMBER2 = "9999999977"
 describe("Sign up endpoint", () => {
 
   it("double signup doesn't work", async () => {
-    const response1 = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+    const response1 = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
       number: PHONE_NUMBER1,
     });
 
     expect(response1.status).toBe(200);
 
-    const response2 = await axios.post(`${BACKEND_URL}/api/v1/signup/verify`, {
+    const response2 = await axios.post(`${BACKEND_URL}/api/v1/user/signup/verify`, {
       name: USERNAME1,
       otp: "000000"
     });
@@ -28,7 +28,7 @@ describe("Sign up endpoint", () => {
     expect(response2.data.id).not.toBeNull
 
     expect(async () => {
-      const response3 = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      const response3 = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
         number: PHONE_NUMBER1
       });
     }).toThrow();
