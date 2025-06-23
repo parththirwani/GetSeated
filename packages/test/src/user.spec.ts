@@ -17,13 +17,13 @@ describe("Sign up endpoint", () => {
       number: PHONE_NUMBER1,
     });
 
-    expect(response1.status).toBe(200);
+
 
     const response2 = await axios.post(`${BACKEND_URL}/api/v1/user/signup/verify`, {
       name: USERNAME1,
       otp: "000000"
     });
-
+    expect(response1.status).toBe(200);
     expect(response2.status).toBe(200);
     expect(response2.data.id).not.toBeNull
 
@@ -35,4 +35,26 @@ describe("Sign up endpoint", () => {
   });
 
 })
+
+describe("Sign in endpoint", () => {
+
+  it("Signup dosent work", async () => {
+    const response1 = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
+      number: PHONE_NUMBER1,
+    });
+
+    const response2 = await axios.post(`${BACKEND_URL}/api/v1/user/signin/verify`, {
+      name: USERNAME1,
+      otp: "000000"
+    });
+
+    expect(response1.status).toBe(200);
+    expect(response2.status).toBe(200);
+    expect(response2.data.id).not.toBeNull
+    expect(response2.data.token).not.toBeNull
+
+  });
+
+})
+
 

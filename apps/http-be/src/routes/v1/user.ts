@@ -1,10 +1,12 @@
 import { client } from "@repo/db/client";
-import { generateToken, verifyToken } from "authenticator";
+
 import { Router } from "express";
 import express from "express";
 import jwt from "jsonwebtoken"
 import { JWT_PASSWORD } from "./config";
 import { sendMessage } from "../../utils/twillio";
+import { getTotp, verifyToken } from "../../utils/totp";
+
 
 //TODO: add all the string literals to a file for supporting different languages
 
@@ -12,14 +14,14 @@ const userRouter: Router = express.Router();
 
 userRouter.post("/signup", async (req, res) => {
   const number = req.body.phoneNumber;
-  const totp = generateToken(number + "SIGNUP")
+  const totp = getTotp(number, "AUTH")
   const user = await client.user.upsert({
     where: {
       number
     },
     create: {
       number,
-      name:""
+      name: ""
     },
     update: {
 
@@ -46,7 +48,8 @@ userRouter.post("/signup", async (req, res) => {
 userRouter.post("/signup/verify", async (req, res) => {
   const number = req.body.phoneNumber;
   const name = req.body.name
-  if (!verifyToken(number + "SIGNUP", req.body.totp)) {
+  const otp = req.body.totp
+  if (process.env.NODE__ENV === "production" && !verifyToken(number, "AUTH", otp)) {
     res.json({
       message: "Wrong otp try again"
     })
@@ -77,7 +80,7 @@ userRouter.post("/signup/verify", async (req, res) => {
 
 userRouter.post("/signin", async (req, res) => {
   const number = req.body.phoneNumber;
-  const totp = generateToken(number + "SIGNUP")
+  const totp = getTotp(number, "AUTH")
 
   if (process.env.NODE_ENV === "production") {
     try {
@@ -98,7 +101,8 @@ userRouter.post("/signin", async (req, res) => {
 
 userRouter.post("/signin/verify", async (req, res) => {
   const number = req.body.phoneNumber;
-  if (!verifyToken(number + "SIGNUP", req.body.totp)) {
+  const otp = req.body.totp
+if (process.env.NODE_ENV === "production" && !verifyToken(number, "AUTH", otp)) {
     res.json({
       message: "Wrong otp try again"
     })
