@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { Router } from "express";
 import express from "express";
 import userRouter from "./user";

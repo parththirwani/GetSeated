@@ -4,15 +4,20 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -b",
-    "start": "node dist/index.js",
+    "start": "NODE_ENV=production node dist/index.js",
     "dev": "pnpm run build && pnpm run start"
   },
   "dependencies": {
+    "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/authenticator": "^1.1.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "authenticator": "^1.1.5",
     "axios": "^1.10.0",
-    "express": "^5.1.0"
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "twilio": "^5.7.1"
   },
   "keywords": [],
   "author": "",
