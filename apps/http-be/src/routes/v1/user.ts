@@ -53,7 +53,7 @@ userRouter.post("/signup/verify", async (req, res) => {
     return
   }
 
-  const userId = await client.user.update({
+  const user = await client.user.update({
     where: {
       number
     },
@@ -64,9 +64,56 @@ userRouter.post("/signup/verify", async (req, res) => {
   })
 
   const token = jwt.sign({
-    userId
+    userId: user.id
   }, JWT_PASSWORD)
   //TODO: replace jwt with access refresh tokens
+
+  res.json({
+    message: "User Authenticated",
+    token
+  })
+
+});
+
+userRouter.post("/signin", async (req, res) => {
+  const number = req.body.phoneNumber;
+  const totp = generateToken(number + "SIGNUP")
+
+  if (process.env.NODE_ENV === "production") {
+    try {
+      await sendMessage(`Your otp for logging into GetSeated is ${totp}`, number)
+    } catch (e) {
+      res.status(500).json({
+        message: "Could not sent otp"
+      })
+      return
+    }
+  }
+
+  res.json({
+    message: "Otp sent",
+    totp
+  });
+});
+
+userRouter.post("/signin/verify", async (req, res) => {
+  const number = req.body.phoneNumber;
+  if (!verifyToken(number + "SIGNUP", req.body.totp)) {
+    res.json({
+      message: "Wrong otp try again"
+    })
+    return
+  }
+
+  const user = await client.user.findFirstOrThrow({
+    where: {
+      number
+    },
+  })
+
+  const token = jwt.sign({
+    userId: user.id
+  }, JWT_PASSWORD)
 
   res.json({
     message: "User Authenticated",
